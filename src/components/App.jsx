@@ -1,22 +1,16 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts, selectError, selectIsLoading } from 'redux/selectors';
-import { fetchContactsThunk } from 'redux/operations';
+import { useState } from 'react';
 import { Section } from './Section/Section';
 import { ContactForm } from './ContactForm/ContactForm';
 import { Filter } from './Filter/Filter';
 import { ContactList } from './ContactList/ContactList';
 import { Contact } from './Contact/Contact';
+import { useFetchContactsQuery } from 'services/ContactsAPI';
 
 const PhoneBook = () => {
-  const dispatch = useDispatch();
-  const contacts = useSelector(selectContacts);
-  const isLoading = useSelector(selectIsLoading);
-  const error = useSelector(selectError);
+  const [filter, setFilter] = useState('');
+  const getFilter = filter => setFilter(filter);
 
-  useEffect(() => {
-    dispatch(fetchContactsThunk());
-  }, [dispatch]);
+  const { data: contacts, isLoading, error } = useFetchContactsQuery();
 
   return (
     <>
@@ -24,10 +18,10 @@ const PhoneBook = () => {
         <ContactForm></ContactForm>
       </Section>
       {isLoading && !error && <b>Request in progress...</b>}
-      {contacts.length > 0 && (
+      {contacts && contacts.length > 0 && (
         <Section title={'Contacts'}>
-          <Filter />
-          <ContactList>
+          <Filter getFilter={getFilter} />
+          <ContactList filter={filter}>
             <Contact />
           </ContactList>
         </Section>

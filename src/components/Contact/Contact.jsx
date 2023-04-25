@@ -1,24 +1,38 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { selectFilteredContacts } from 'redux/selectors';
-import { deleteContactThunk } from 'redux/operations';
+import { useDeleteContactMutation } from 'services/ContactsAPI';
+import { Button, Spinner } from 'react-bootstrap';
+import './Contact.module.css';
 
-export const Contact = () => {
-  const dispatch = useDispatch();
-  const filteredContacts = useSelector(selectFilteredContacts);
+export const Contact = ({ id, name, phone }) => {
+  const [deleteContact, { isLoading }] = useDeleteContactMutation();
 
-  return filteredContacts.map(({ id, name, phone }) => (
-    <li key={id}>
+  return (
+    <li>
       <span>
-        {name}: {phone}
+        {name}: <span>{phone}</span>
       </span>
-      <button
-        onClick={() => {
-          dispatch(deleteContactThunk(id));
-        }}
+      <Button
+        variant="danger"
         type="button"
+        disabled={isLoading}
+        onClick={() => {
+          deleteContact(id);
+        }}
       >
-        Delete
-      </button>
+        {isLoading ? (
+          <>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+            <span className="visually-hidden">Loading...</span>
+          </>
+        ) : (
+          <span>Delete</span>
+        )}
+      </Button>
     </li>
-  ));
+  );
 };

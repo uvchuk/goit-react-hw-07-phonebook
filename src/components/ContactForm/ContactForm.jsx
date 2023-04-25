@@ -1,12 +1,13 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts } from 'redux/selectors';
-import { addContactThunk } from 'redux/operations';
+import {
+  useAddContactMutation,
+  useFetchContactsQuery,
+} from 'services/ContactsAPI';
+import { Button, Spinner } from 'react-bootstrap';
 import './ContactForm.module.css';
 
 export const ContactForm = () => {
-  const dispatch = useDispatch();
-  const contacts = useSelector(selectContacts);
-
+  const { data: contacts } = useFetchContactsQuery();
+  const [addContact, { isLoading }] = useAddContactMutation();
   const onSubmit = evt => {
     evt.preventDefault();
     const form = evt.target;
@@ -14,7 +15,7 @@ export const ContactForm = () => {
     const phone = form.elements.number.value;
     if (checkIfExist(name))
       return alert('This contact is exist in your phonebook!');
-    dispatch(addContactThunk({ name, phone }));
+    addContact({ name, phone });
     form.reset();
   };
 
@@ -25,7 +26,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form autoComplete="off" onSubmit={onSubmit}>
       <label>
         <p>Name</p>
         <input
@@ -46,7 +47,22 @@ export const ContactForm = () => {
           required
         />
       </label>
-      <button type="submit">Add to contact</button>
+      <Button variant="primary" type="submit" disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+            <span className="visually-hidden">Loading...</span>
+          </>
+        ) : (
+          <span>Add to contact</span>
+        )}
+      </Button>
     </form>
   );
 };

@@ -1,0 +1,17 @@
+li {
+  display: flex;
+  justify-content: space-between;
+}
+
+li:not(:last-child) {
+  margin-bottom: 5px;
+}
+
+span {
+  display: grid;
+  font-weight: 600;
+}
+
+span:only-child {
+  font-weight: 400;
+}

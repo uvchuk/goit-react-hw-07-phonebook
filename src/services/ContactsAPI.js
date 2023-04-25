@@ -1,17 +1,28 @@
-import axios from 'axios';
-axios.defaults.baseURL = 'https://643d8ea86c30feced8155e77.mockapi.io';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const fetchContacts = async () => {
-  const data = await axios.get('/contacts');
-  return data;
-};
+export const contactsApi = createApi({
+  reducerPath: 'contactsApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://643d8ea86c30feced8155e77.mockapi.io',
+  }),
+  endpoints: builder => ({
+    fetchContacts: builder.query({
+      query: () => `/contacts`,
+      providesTags: ['Contacts'],
+    }),
+    addContact: builder.mutation({
+      query: contact => ({ url: '/contacts', method: 'POST', body: contact }),
+      invalidatesTags: ['Contacts'],
+    }),
+    deleteContact: builder.mutation({
+      query: id => ({ url: `/contacts/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Contacts'],
+    }),
+  }),
+});
 
-export const addContact = async contact => {
-  const data = await axios.post('/contacts', contact);
-  return data;
-};
-
-export const deleteContact = async id => {
-  const data = await axios.delete(`/contacts/${id}`);
-  return data;
-};
+export const {
+  useFetchContactsQuery,
+  useAddContactMutation,
+  useDeleteContactMutation,
+} = contactsApi;
